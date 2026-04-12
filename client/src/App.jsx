@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import './index.css';
 
-const SERVER_URL = '/';
+const SERVER_URL = 'https://webrtc-backend-pd1p.onrender.com' || '/';
 
 function App() {
   const [roomId, setRoomId] = useState('');
