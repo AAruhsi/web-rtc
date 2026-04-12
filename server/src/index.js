@@ -10,7 +10,14 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://webrtc-frontend.onrender.com", 
+    "http://localhost:5173", 
+    "http://localhost:5174"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Determine the port
