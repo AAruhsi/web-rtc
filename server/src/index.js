@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { initSocket } from './socket/socket.js';
 import { logger } from './utils/logger.js';
+import { ALLOWED_ORIGINS } from './config/cors.js';
 
 dotenv.config();
 
@@ -11,11 +12,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(cors({
-  origin: [
-    "https://webrtc-frontend.onrender.com", 
-    "http://localhost:5173", 
-    "http://localhost:5174"
-  ],
+  origin: ALLOWED_ORIGINS,
   credentials: true
 }));
 app.use(express.json());

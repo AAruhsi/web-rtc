@@ -3,6 +3,7 @@ export const SOCKET_EVENTS = {
   DISCONNECT: 'disconnect',
   USER_DISCONNECTED: 'user-disconnected',
   JOIN_ROOM: 'join-room',
+  LEAVE_ROOM: 'leave-room',
   ROOM_FULL: 'room-full',
   USER_JOINED: 'user-joined',
   OFFER: 'offer',

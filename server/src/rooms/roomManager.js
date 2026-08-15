@@ -5,28 +5,46 @@ const rooms = {};
 
 /**
  * Creates or joins a room for the given socket ID.
+ * @param {object} io
  * @param {string} roomId 
  * @param {string} socketId 
  * @returns {object} { success: boolean, isFull: boolean, otherUser: string|null }
  */
-export const createOrJoinRoom = (roomId, socketId) => {
+export const createOrJoinRoom = (io, roomId, socketId) => {
   if (!rooms[roomId]) {
     rooms[roomId] = [socketId];
     logger.info(`Room created: ${roomId} by user ${socketId}`);
     return { success: true, isFull: false, otherUser: null };
   }
 
-  const room = rooms[roomId];
+  // Prune any disconnected sockets from room
+  if (io && io.sockets && io.sockets.sockets) {
+    rooms[roomId] = rooms[roomId].filter((id) => {
+      const s = io.sockets.sockets.get(id);
+      return s && s.connected;
+    });
+  }
+
+  if (rooms[roomId].length === 0) {
+    rooms[roomId] = [socketId];
+    logger.info(`Room recreated: ${roomId} by user ${socketId}`);
+    return { success: true, isFull: false, otherUser: null };
+  }
+
+  if (rooms[roomId].includes(socketId)) {
+    const otherUser = rooms[roomId].find((id) => id !== socketId) || null;
+    return { success: true, isFull: false, otherUser };
+  }
 
   // Limit to 2 users
-  if (room.length >= 2) {
+  if (rooms[roomId].length >= 2) {
     logger.warn(`Room ${roomId} is full. User ${socketId} rejected.`);
     return { success: false, isFull: true, otherUser: null };
   }
 
   // 1 user is already in the room
-  const otherUser = room[0];
-  room.push(socketId);
+  const otherUser = rooms[roomId][0];
+  rooms[roomId].push(socketId);
   logger.info(`User ${socketId} joined room ${roomId}`);
   
   return { success: true, isFull: false, otherUser };

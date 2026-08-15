@@ -8,7 +8,7 @@ export const registerSocketHandlers = (io, socket) => {
   socket.on(SOCKET_EVENTS.JOIN_ROOM, ({ roomId }) => {
     logger.info(`Received join-room request from ${socket.id} for room ${roomId}`);
     
-    const result = createOrJoinRoom(roomId, socket.id);
+    const result = createOrJoinRoom(io, roomId, socket.id);
 
     if (result.isFull) {
       socket.emit(SOCKET_EVENTS.ROOM_FULL);
@@ -41,7 +41,17 @@ export const registerSocketHandlers = (io, socket) => {
     socket.to(data.roomId).emit(SOCKET_EVENTS.ICE_CANDIDATE, data);
   });
 
-  // 5. User Disconnect
+  // 5. Explicit Leave Room
+  socket.on(SOCKET_EVENTS.LEAVE_ROOM, ({ roomId }) => {
+    if (!roomId) return;
+
+    logger.info(`User ${socket.id} leaving room ${roomId}`);
+    leaveRoom(roomId, socket.id);
+    socket.leave(roomId);
+    socket.to(roomId).emit(SOCKET_EVENTS.USER_DISCONNECTED, { socketId: socket.id });
+  });
+
+  // 6. User Disconnect
   socket.on(SOCKET_EVENTS.DISCONNECT, () => {
     logger.info(`User disconnected: ${socket.id}`);
     

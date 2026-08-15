@@ -11,7 +11,7 @@ export default defineConfig({
     allowedHosts: true, // Allows ngrok to proxy to the dev server
     proxy: {
       '/socket.io': {
-        target: 'https://webrtc-backend-pd1p.onrender.com' || 'http://localhost:6001',
+        target: process.env.VITE_SIGNALING_PROXY_TARGET || 'http://localhost:5000',
         ws: true,
       }
     }

@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { registerSocketHandlers } from './handlers.js';
 import { SOCKET_EVENTS } from '../config/constants.js';
+import { ALLOWED_ORIGINS } from '../config/cors.js';
 import { logger } from '../utils/logger.js';
 
 let io;
@@ -8,8 +9,9 @@ let io;
 export const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: '*', // Allow all origins for MVP
-      methods: ['GET', 'POST']
+      origin: ALLOWED_ORIGINS,
+      methods: ['GET', 'POST'],
+      credentials: true,
     }
   });
 
